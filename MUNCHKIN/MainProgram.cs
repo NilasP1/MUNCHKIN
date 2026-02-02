@@ -24,11 +24,13 @@ namespace MUNCHKIN
 
             Console.WriteLine("All players have been registered. Let the game begin!");
 
-            if(Console.ReadKey().Key == ConsoleKey.C)
+            ConsoleKey key = Console.ReadKey().Key;
+
+            if (key == ConsoleKey.C)
             {
                 CheckOnPlayers();
             }
-            else if(Console.ReadKey().Key == ConsoleKey.D)
+            else if (key == ConsoleKey.D)
             {
                 ShowBothDecks();
             }
