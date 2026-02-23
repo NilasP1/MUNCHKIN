@@ -14,8 +14,6 @@ namespace MUNCHKIN
         public string EquipmentSlot;
         public string specialEffect;
 
-        public int GoldValue;
-
         static Random random = new Random();
         static List<string> equipmentNames = new List<string>
         {

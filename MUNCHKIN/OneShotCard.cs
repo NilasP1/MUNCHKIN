@@ -10,7 +10,6 @@ namespace MUNCHKIN
     {
         public string OneShotName;
         public string OneShotEffect;
-        public int GoldValue;
         static Random random = new Random();
         static List<string> oneShotNames = new List<string>
         {

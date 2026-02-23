@@ -9,38 +9,9 @@ namespace MUNCHKIN
 {
     internal class DoorCard : Card
     {
-        public int NumberOfCardsInDorrDeck = 50;
-        public List<DoorCard> doorDeck = new List<DoorCard>();
-        static Random rand = new Random();
+        // Base class for all Door-type cards:
+        // MonsterCard, CurseCard, RaceCard, ClassCard
 
-        public DoorCard()
-        {
-            CreateDoorDeck();
-        }
-
-        public void CreateDoorDeck()
-        {
-            for (int i = 0; i < NumberOfCardsInDorrDeck; i++)
-            {
-                int randomCardType = rand.Next(1, 5);
-
-                if (randomCardType == 1)
-                {
-                    doorDeck.Add(new MonsterCard());
-                }
-                else if (randomCardType == 2)
-                {
-                    doorDeck.Add(new CurseCard());
-                }
-                else if (randomCardType == 3)
-                {
-                    doorDeck.Add(new RaceCard());
-                }
-                else if (randomCardType == 4)
-                {
-                    doorDeck.Add(new ClassCard());
-                }
-            }
-        }
+        public string Name { get; protected set; }
     }
 }

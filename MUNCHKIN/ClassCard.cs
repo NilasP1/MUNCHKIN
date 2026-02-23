@@ -12,10 +12,12 @@ namespace MUNCHKIN
         public string ClassAbility;
 
         static Random rand = new Random();
-        int ClassRandomnumber = rand.Next(1, 5);
+        
 
         public ClassCard()
         {
+            int ClassRandomnumber = rand.Next(1, 5);
+
             if (ClassRandomnumber == 1)
             {
                 ClassName = "Warrior";
