@@ -13,7 +13,10 @@ namespace MUNCHKIN
 
         public static void Run()
         {
-            Console.WriteLine("Hello and welcome to Munchkin! How many players will be playing today?");
+            Console.Clear();
+            Console.WriteLine("Welcome to Munchkin!");
+            Console.Write("How many players? ");
+
             if (!int.TryParse(Console.ReadLine(), out numberOfPlayers) || numberOfPlayers <= 0)
             {
                 Console.WriteLine("Invalid number of players.");
@@ -22,94 +25,254 @@ namespace MUNCHKIN
 
             for (int i = 0; i < numberOfPlayers; i++)
             {
-                Console.WriteLine($"Enter the name of player {i + 1}:");
-                string playerName = Console.ReadLine() ?? $"Player{i + 1}";
-                // Initialize lists to avoid null warnings
+                Console.Clear();
+                Console.Write($"Enter name for Player {i + 1}: ");
+                string name = Console.ReadLine() ?? $"Player{i + 1}";
+
                 players.Add(new Player
                 {
-                    Name = playerName,
+                    Name = name,
+                    level = 1,
                     equipedEquipmentCards = new List<EquipmentCard>(),
                     cardsOnHand = new List<Card>()
                 });
             }
 
-            // Create decks via the deck objects (do not instantiate abstract base card types)
-            doorDeck.CreateDeck(50);      // pick an appropriate amount or implement deck factory logic
+            doorDeck.CreateDeck(50);
             treasureDeck.CreateDeck(50);
 
-            Console.WriteLine("All players have been registered. Let the game begin!");
-            Console.WriteLine("Press C to check players, D to show decks.");
+            foreach (var player in players)
+            {
+                while (player.cardsOnHand.Count < 8 && doorDeck.cards.Count > 0)
+                    player.cardsOnHand.Add(doorDeck.Draw());
+            }
 
-            ConsoleKey key = Console.ReadKey().Key;
+            Console.Clear();
+            Console.WriteLine("Game setup complete!");
+            Console.ReadKey();
 
-            // Main game loop to allow user interaction until they choose to quit
+            MainMenu();
+        }
+
+        static void MainMenu()
+        {
             while (true)
             {
-                Console.WriteLine("Press C to check players, D to show decks, or Q to quit.");
-                key = Console.ReadKey().Key;
-                Console.WriteLine();
+                Console.Clear();
+                Console.WriteLine("=== MAIN MENU ===");
+                Console.WriteLine("C = Check players");
+                Console.WriteLine("T = Start turns");
+                Console.WriteLine("Q = Quit");
+
+                var key = Console.ReadKey().Key;
+
                 if (key == ConsoleKey.C)
                 {
+                    Console.Clear();
                     CheckOnPlayers();
+                    Console.ReadKey();
                 }
-                else if (key == ConsoleKey.D)
+                else if (key == ConsoleKey.T)
                 {
-                    ShowBothDecks();
+                    StartTurnPhase();
                 }
                 else if (key == ConsoleKey.Q)
                 {
-                    Console.WriteLine("Thanks for playing Munchkin! Goodbye!");
+                    Console.Clear();
+                    Console.WriteLine("Goodbye!");
                     break;
                 }
             }
         }
 
-        static public void CheckOnPlayers()
+        static void StartTurnPhase()
         {
-            for (int i = 0; i < numberOfPlayers; i++)
+            int currentPlayerIndex = 0;
+
+            while (true)
             {
-                Console.WriteLine($"Player {i + 1}: {players[i].Name}, Level: {players[i].level}");
+                Console.Clear();
+                var currentPlayer = players[currentPlayerIndex];
+
+                Console.WriteLine($"--- {currentPlayer.Name}'s Turn ---");
+                Console.WriteLine($"Level: {currentPlayer.level}");
+                Console.WriteLine();
+                Console.WriteLine("M = Show hand");
+                Console.WriteLine("L = Play card");
+                Console.WriteLine("D = Kick open door");
+                Console.WriteLine("R = Discard card");
+                Console.WriteLine("N = Next player");
+                Console.WriteLine("P = Previous player");
+                Console.WriteLine("E = End turn phase");
+                Console.WriteLine("Q = Quit game");
+
+                var key = Console.ReadKey().Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.M:
+                        Console.Clear();
+                        ShowHand(currentPlayer);
+                        Console.ReadKey();
+                        break;
+
+                    case ConsoleKey.L:
+                        Console.Clear();
+                        PlayCard(currentPlayer);
+                        Console.ReadKey();
+                        break;
+
+                    case ConsoleKey.D:
+                        Console.Clear();
+                        KickOpenDoor(currentPlayer);
+                        Console.ReadKey();
+                        break;
+
+                    case ConsoleKey.R:
+                        Console.Clear();
+                        DiscardCard(currentPlayer);
+                        Console.ReadKey();
+                        break;
+
+                    case ConsoleKey.N:
+                        currentPlayerIndex = (currentPlayerIndex + 1) % players.Count;
+                        break;
+
+                    case ConsoleKey.P:
+                        currentPlayerIndex = (currentPlayerIndex - 1 + players.Count) % players.Count;
+                        break;
+
+                    case ConsoleKey.E:
+                        return;
+
+                    case ConsoleKey.Q:
+                        Environment.Exit(0);
+                        break;
+                }
             }
         }
 
-        static public void ShowBothDecks()
+        static void ShowHand(Player player)
         {
-            Console.WriteLine("Door Deck:");
+            Console.WriteLine($"{player.Name}'s Hand:\n");
 
-            // Use the deck field name declared in DoorDeck (signature shows 'cards')
-            foreach (var card in doorDeck.cards)
+            if (player.cardsOnHand.Count == 0)
             {
-                if (card is MonsterCard monster)
-                {
-                    Console.WriteLine($"Monster: {monster.MonsterName}, Level: {monster.MonsterLevel}");
-                }
-                else if (card is CurseCard cursecard)
-                {
-                    Console.WriteLine($"Curse Card: {cursecard.CurseName}, Effect: {cursecard.CurseEffect}");
-                }
-                else if (card is RaceCard racecard)
-                {
-                    Console.WriteLine($"Race Card: {racecard.RaceName}, Ability: {racecard.RaceAbility}");
-                }
-                else if (card is ClassCard classcard)
-                {
-                    Console.WriteLine($"Class Card: {classcard.ClassName}, Ability: {classcard.ClassAbility}");
-                }
+                Console.WriteLine("(Empty)");
+                return;
             }
 
-            Console.WriteLine("\nTreasure Deck:");
-
-            foreach (var card in treasureDeck.cards)
+            for (int i = 0; i < player.cardsOnHand.Count; i++)
             {
-                if (card is EquipmentCard equipment)
+                Console.WriteLine($"{i + 1}. {GetCardDetails(player.cardsOnHand[i])}");
+                Console.WriteLine("-----------------------------------");
+            }
+        }
+
+        static string GetCardDetails(Card card)
+        {
+            if (card is MonsterCard m)
+                return $"MONSTER\nName: {m.MonsterName}\nLevel: {m.MonsterLevel}";
+
+            if (card is CurseCard c)
+                return $"CURSE\nName: {c.CurseName}\nEffect: {c.CurseEffect}";
+
+            if (card is RaceCard r)
+                return $"RACE\nName: {r.RaceName}\nAbility: {r.RaceAbility}";
+
+            if (card is ClassCard cl)
+                return $"CLASS\nName: {cl.ClassName}\nAbility: {cl.ClassAbility}";
+
+            if (card is EquipmentCard e)
+                return $"EQUIPMENT\nName: {e.EqupipmentName}\nSlot: {e.EquipmentSlot}\nBonus: +{e.BattleBonus}\nEffect: {e.specialEffect}";
+
+            if (card is OneShotCard o)
+                return $"ONE SHOT\nName: {o.OneShotName}\nEffect: {o.OneShotEffect}";
+
+            if (card is TreasureCard t)
+                return $"TREASURE\nGold Value: {t.GoldValue}";
+
+            return card.GetType().Name;
+        }
+
+        static void PlayCard(Player player)
+        {
+            ShowHand(player);
+
+            Console.Write("\nEnter card number to play: ");
+
+            if (int.TryParse(Console.ReadLine(), out int index))
+            {
+                index--;
+
+                if (index >= 0 && index < player.cardsOnHand.Count)
                 {
-                    Console.WriteLine($"Equipment: {equipment.EqupipmentName}, Slot: {equipment.EquipmentSlot}, Bonus: {equipment.BattleBonus}");
-                }
-                else if (card is OneShotCard oneshotcard)
-                {
-                    Console.WriteLine($"OneShot Card: {oneshotcard.OneShotName}, Effect: {oneshotcard.OneShotEffect}");
+                    Card card = player.cardsOnHand[index];
+
+                    Console.WriteLine("\nPlaying:");
+                    Console.WriteLine(GetCardDetails(card));
+
+                    if (card is EquipmentCard equipment)
+                    {
+                        player.equipedEquipmentCards.Add(equipment);
+                        Console.WriteLine("Equipment equipped!");
+                    }
+
+                    player.cardsOnHand.RemoveAt(index);
                 }
             }
+        }
+
+        static void DiscardCard(Player player)
+        {
+            ShowHand(player);
+
+            Console.Write("\nEnter card number to discard: ");
+
+            if (int.TryParse(Console.ReadLine(), out int index))
+            {
+                index--;
+
+                if (index >= 0 && index < player.cardsOnHand.Count)
+                {
+                    player.cardsOnHand.RemoveAt(index);
+                    Console.WriteLine("Card discarded.");
+                }
+            }
+        }
+
+        static void KickOpenDoor(Player player)
+        {
+            if (doorDeck.cards.Count == 0)
+            {
+                Console.WriteLine("Door deck is empty!");
+                return;
+            }
+
+            Card drawn = doorDeck.Draw();
+
+            Console.WriteLine("You drew:");
+            Console.WriteLine(GetCardDetails(drawn));
+            Console.WriteLine();
+
+            if (drawn is MonsterCard monster)
+            {
+                Console.WriteLine("Monster fight!");
+                Console.WriteLine("You defeat it automatically (for now).");
+                player.level++;
+                Console.WriteLine($"You are now Level {player.level}");
+            }
+            else
+            {
+                player.cardsOnHand.Add(drawn);
+                Console.WriteLine("Card added to hand.");
+            }
+        }
+
+        static void CheckOnPlayers()
+        {
+            foreach (var player in players)
+                Console.WriteLine($"{player.Name} - Level {player.level}");
         }
     }
 }
