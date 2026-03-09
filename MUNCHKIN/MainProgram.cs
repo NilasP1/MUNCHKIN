@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace MUNCHKIN
 {
@@ -38,14 +39,23 @@ namespace MUNCHKIN
                 });
             }
 
-            doorDeck.CreateDeck(50);
-            treasureDeck.CreateDeck(50);
+            doorDeck.CreateDeck(95);
+            treasureDeck.CreateDeck(73);
 
-            foreach (var player in players)
+            foreach (Player player in players)
             {
-                while (player.cardsOnHand.Count < 8 && doorDeck.cards.Count > 0)
-                    player.cardsOnHand.Add(doorDeck.Draw());
-            }
+                for (int i = 0; i < 4; i++)
+                {
+                    if (doorDeck.cards.Count > 0)
+                        player.cardsOnHand.Add(doorDeck.Draw());
+                } 
+                
+                for (int i = 0; i < 4; i++)
+                {
+                    if (treasureDeck.cards.Count > 0)
+                        player.cardsOnHand.Add(treasureDeck.Draw());
+                }
+            } 
 
             Console.Clear();
             Console.WriteLine("Game setup complete!");

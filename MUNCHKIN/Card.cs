@@ -21,14 +21,15 @@ namespace MUNCHKIN
             {
                 int randomCardType = rand.Next(1, 5);
 
-                if (randomCardType == 1)
-                    cards.Add(new MonsterCard());
-                else if (randomCardType == 2)
-                    cards.Add(new CurseCard());
-                else if (randomCardType == 3)
-                    cards.Add(new RaceCard());
-                else
-                    cards.Add(new ClassCard());
+                DoorCard card = randomCardType switch
+                {
+                    1 => new MonsterCard(),
+                    2 => new CurseCard(),
+                    3 => new RaceCard(),
+                    _ => new ClassCard()
+                };
+
+                cards.Add(card);
             }
         }
 
@@ -54,10 +55,13 @@ namespace MUNCHKIN
             {
                 int randomCardType = rand.Next(1, 3);
 
-                if (randomCardType == 1)
-                    cards.Add(new EquipmentCard());
-                else
-                    cards.Add(new OneShotCard());
+                TreasureCard card = randomCardType switch
+                {
+                    1 => new OneShotCard(),
+                    _ => new EquipmentCard()
+                };
+
+                cards.Add(card);
             }
         }
 
