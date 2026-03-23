@@ -14,7 +14,23 @@ namespace MUNCHKIN
         public string playerClass;
         public int goldCoins = 0;
 
-        public List<EquipmentCard> equipedEquipmentCards;
-        public List<Card> cardsOnHand;
+        //public EquipmentCard equippedHead;
+        //public EquipmentCard equippedBody;
+        //public EquipmentCard equippedFeet;
+        //public EquipmentCard equippedHand1;
+        //public EquipmentCard equippedHand2;
+        //public EquipmentCard Accessory;
+
+        public Dictionary<EquipmentSlot, EquipmentCard?> EquippedItems = new()
+        {
+            [EquipmentSlot.Accessory] = null,
+            [EquipmentSlot.Head] = null,
+            [EquipmentSlot.Body] = null,
+            [EquipmentSlot.Feet] = null,
+            [EquipmentSlot.Hands1] = null,
+            [EquipmentSlot.Hands2] = null
+        };
+
+        public List<Card> CardsOnHand;
     }
 }

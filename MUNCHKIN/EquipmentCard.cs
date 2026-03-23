@@ -11,7 +11,7 @@ namespace MUNCHKIN
         public string EqupipmentName;
         public int BattleBonus;
 
-        public string EquipmentSlot;
+        public EquipmentSlot Slot;
         public string specialEffect;
 
         static Random random = new Random();
@@ -25,33 +25,43 @@ namespace MUNCHKIN
         public EquipmentCard()
         {
             EqupipmentName = equipmentNames[random.Next(equipmentNames.Count)];
-            EquipmentSlot = GetSlotFromName(EqupipmentName);
+            Slot = GetSlotFromName(EqupipmentName);
 
             BattleBonus = random.Next(1, 11);
             GoldValue = random.Next(100, 1001);
             specialEffect = "No special effect";
         }
 
-        private string GetSlotFromName(string name)
+        private EquipmentSlot GetSlotFromName(string name)
         {
             if (name.Contains("Sword") || name.Contains("Bow") || name.Contains("Dagger") || name.Contains("Staff"))
-                return "Hands";
+                return EquipmentSlot.Hands1;
 
             if (name.Contains("Helmet"))
-                return "Head";
+                return EquipmentSlot.Head;
 
             if (name.Contains("Boots"))
-                return "Feet";
+                return EquipmentSlot.Feet;
 
             if (name.Contains("Armor"))
-                return "Body";
+                return EquipmentSlot.Body;
 
             if (name.Contains("Shield"))
-                return "Hands";
+                return EquipmentSlot.Hands2;
 
             // Rings, Amulets, Cloaks, etc.
-            return "Accessory";
+            return EquipmentSlot.Accessory;
         }
 
     }
+}
+
+public enum EquipmentSlot
+{
+    Head,
+    Body,
+    Feet,
+    Hands1,
+    Hands2,
+    Accessory
 }

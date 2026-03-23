@@ -34,8 +34,7 @@ namespace MUNCHKIN
                 {
                     Name = name,
                     level = 1,
-                    equipedEquipmentCards = new List<EquipmentCard>(),
-                    cardsOnHand = new List<Card>()
+                    CardsOnHand = new List<Card>()
                 });
             }
 
@@ -47,13 +46,13 @@ namespace MUNCHKIN
                 for (int i = 0; i < 4; i++)
                 {
                     if (doorDeck.cards.Count > 0)
-                        player.cardsOnHand.Add(doorDeck.Draw());
+                        player.CardsOnHand.Add(doorDeck.Draw());
                 } 
                 
                 for (int i = 0; i < 4; i++)
                 {
                     if (treasureDeck.cards.Count > 0)
-                        player.cardsOnHand.Add(treasureDeck.Draw());
+                        player.CardsOnHand.Add(treasureDeck.Draw());
                 }
             } 
 
@@ -103,6 +102,7 @@ namespace MUNCHKIN
             {
                 Console.Clear();
                 var currentPlayer = players[currentPlayerIndex];
+                var nextPlayer = players[(currentPlayerIndex + 1) % players.Count];
 
                 Console.WriteLine($"--- {currentPlayer.Name}'s Turn ---");
                 Console.WriteLine($"Level: {currentPlayer.level}");
@@ -128,7 +128,7 @@ namespace MUNCHKIN
 
                     case ConsoleKey.L:
                         Console.Clear();
-                        PlayCard(currentPlayer);
+                        PlayCard(currentPlayer, nextPlayer);
                         Console.ReadKey();
                         break;
 
@@ -166,15 +166,15 @@ namespace MUNCHKIN
         {
             Console.WriteLine($"{player.Name}'s Hand:\n");
 
-            if (player.cardsOnHand.Count == 0)
+            if (player.CardsOnHand.Count == 0)
             {
                 Console.WriteLine("(Empty)");
                 return;
             }
 
-            for (int i = 0; i < player.cardsOnHand.Count; i++)
+            for (int i = 0; i < player.CardsOnHand.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {GetCardDetails(player.cardsOnHand[i])}");
+                Console.WriteLine($"{i + 1}. {GetCardDetails(player.CardsOnHand[i])}");
                 Console.WriteLine("-----------------------------------");
             }
         }
@@ -194,7 +194,7 @@ namespace MUNCHKIN
                 return $"CLASS\nName: {cl.ClassName}\nAbility: {cl.ClassAbility}";
 
             if (card is EquipmentCard e)
-                return $"EQUIPMENT\nName: {e.EqupipmentName}\nSlot: {e.EquipmentSlot}\nBonus: +{e.BattleBonus}\nEffect: {e.specialEffect}";
+                return $"EQUIPMENT\nName: {e.EqupipmentName}\nSlot: {e.Slot}\nBonus: +{e.BattleBonus}\nEffect: {e.specialEffect}";
 
             if (card is OneShotCard o)
                 return $"ONE SHOT\nName: {o.OneShotName}\nEffect: {o.OneShotEffect}";
@@ -205,7 +205,7 @@ namespace MUNCHKIN
             return card.GetType().Name;
         }
 
-        static void PlayCard(Player player)
+        static void PlayCard(Player player, Player nextplayer)
         {
             ShowHand(player);
 
@@ -215,20 +215,49 @@ namespace MUNCHKIN
             {
                 index--;
 
-                if (index >= 0 && index < player.cardsOnHand.Count)
+                if (index >= 0 && index < player.CardsOnHand.Count)
                 {
-                    Card card = player.cardsOnHand[index];
+                    Card card = player.CardsOnHand[index];
 
                     Console.WriteLine("\nPlaying:");
                     Console.WriteLine(GetCardDetails(card));
 
                     if (card is EquipmentCard equipment)
                     {
-                        player.equipedEquipmentCards.Add(equipment);
-                        Console.WriteLine("Equipment equipped!");
+                        player.EquippedItems[equipment.Slot] = equipment;
+                    }
+                    else if (card is CurseCard curse)
+                    {
+                        Console.WriteLine("Who do you want to play the curse on?");
+                        Player targetPlayer = null;
+
+                        for (int i = 0; i < numberOfPlayers; i++)
+                        {
+                            Console.WriteLine($"{i+1}. {players[i].Name}");
+                        }
+
+                        int selectedIndex = Console.ReadKey().KeyChar - '1';
+                        if (selectedIndex >= 0 && selectedIndex < players.Count)
+                        {
+                            targetPlayer = players[selectedIndex];
+                        }
+
+                        if (curse.CurseEffect == "LoseLevel")
+                        {
+                            targetPlayer.level = Math.Max(1, player.level - 1);
+                        }
+                        else if (curse.CurseEffect == "DiscardEquipment")
+                        {
+                            EquipmentSlot DiscardInput;
+                            Console.WriteLine("Which equipment slot to discard? (Head, Body, Feet, Hands1, Hands2, Accessory)");
+                            if (Enum.TryParse(Console.ReadLine(), true, out DiscardInput))
+                            {
+                                targetPlayer.EquippedItems[DiscardInput] = null;
+                            }
+                        }
                     }
 
-                    player.cardsOnHand.RemoveAt(index);
+                    player.CardsOnHand.RemoveAt(index);
                 }
             }
         }
@@ -243,9 +272,9 @@ namespace MUNCHKIN
             {
                 index--;
 
-                if (index >= 0 && index < player.cardsOnHand.Count)
+                if (index >= 0 && index < player.CardsOnHand.Count)
                 {
-                    player.cardsOnHand.RemoveAt(index);
+                    player.CardsOnHand.RemoveAt(index);
                     Console.WriteLine("Card discarded.");
                 }
             }
@@ -274,7 +303,7 @@ namespace MUNCHKIN
             }
             else
             {
-                player.cardsOnHand.Add(drawn);
+                player.CardsOnHand.Add(drawn);
                 Console.WriteLine("Card added to hand.");
             }
         }

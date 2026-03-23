@@ -19,12 +19,12 @@ namespace MUNCHKIN
             if (ranodmNumber == 0)
             {
                 CurseName = "Lose a Level";
-                CurseEffect = "The player loses one level.";
+                CurseEffect = "LoseLevel";
             }
             else if (ranodmNumber == 1)
             {
                 CurseName = "Discard Equipment";
-                CurseEffect = "The player must discard one piece of equipment.";
+                CurseEffect = "DiscardEquipment";
             }
         }
     }
