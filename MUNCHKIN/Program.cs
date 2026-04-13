@@ -4,8 +4,8 @@
     {
         static void Main(string[] args)
         {
-            MainProgram mainProgram = new MainProgram();
-            MainProgram.Run();
+            MunchkinGame game = new MunchkinGame();
+            game.Run();
         }
     }
 }

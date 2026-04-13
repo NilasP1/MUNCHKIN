@@ -11,20 +11,22 @@ namespace MUNCHKIN
         public string CurseName;
         public string CurseEffect;
 
-        static Random rand = new Random();
-        int ranodmNumber = rand.Next(0, 2); 
+        
 
-        public CurseCard()
+        internal void ApplyCurseEffect(Player targetPlayer)
         {
-            if (ranodmNumber == 0)
+            if (CurseEffect == "LoseLevel")
             {
-                CurseName = "Lose a Level";
-                CurseEffect = "LoseLevel";
+                targetPlayer.level = Math.Max(1, targetPlayer.level - 1);
             }
-            else if (ranodmNumber == 1)
+            else if (CurseEffect == "DiscardEquipment")
             {
-                CurseName = "Discard Equipment";
-                CurseEffect = "DiscardEquipment";
+                EquipmentSlot DiscardInput;
+                Console.WriteLine("Which equipment slot to discard? (Head, Body, Feet, Hands1, Hands2, Accessory)");
+                if (Enum.TryParse(Console.ReadLine(), true, out DiscardInput))
+                {
+                    targetPlayer.EquippedItems[DiscardInput] = null;
+                }
             }
         }
     }

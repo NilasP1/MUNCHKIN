@@ -4,6 +4,6 @@ namespace MUNCHKIN
 {
     internal class TreasureCard : Card
     {
-        public int GoldValue { get; protected set; }
+        public int GoldValue { get; set; }
     }
 }

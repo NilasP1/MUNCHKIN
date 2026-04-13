@@ -4,15 +4,22 @@ using System.Numerics;
 
 namespace MUNCHKIN
 {
-    internal class MainProgram
+    public class MunchkinGame
     {
-        static int numberOfPlayers;
-        static List<Player> players = new List<Player>();
+        int numberOfPlayers;
+        List<Player> players = new List<Player>();
 
-        static DoorDeck doorDeck = new DoorDeck();
-        static TreasureDeck treasureDeck = new TreasureDeck();
+        private DoorDeck doorDeck;
+        private TreasureDeck treasureDeck;
+        Random rand = new Random();
 
-        public static void Run()
+        public MunchkinGame()
+        {
+            doorDeck = new DoorDeck(rand);
+            treasureDeck = new TreasureDeck(rand);
+        }
+
+        public void Run()
         {
             Console.Clear();
             Console.WriteLine("Welcome to Munchkin!");
@@ -63,7 +70,7 @@ namespace MUNCHKIN
             MainMenu();
         }
 
-        static void MainMenu()
+        private void MainMenu()
         {
             while (true)
             {
@@ -94,7 +101,7 @@ namespace MUNCHKIN
             }
         }
 
-        static void StartTurnPhase()
+        private void StartTurnPhase()
         {
             int currentPlayerIndex = 0;
 
@@ -162,7 +169,7 @@ namespace MUNCHKIN
             }
         }
 
-        static void ShowHand(Player player)
+        private void ShowHand(Player player)
         {
             Console.WriteLine($"{player.Name}'s Hand:\n");
 
@@ -179,7 +186,7 @@ namespace MUNCHKIN
             }
         }
 
-        static string GetCardDetails(Card card)
+        private string GetCardDetails(Card card)
         {
             if (card is MonsterCard m)
                 return $"MONSTER\nName: {m.MonsterName}\nLevel: {m.MonsterLevel}";
@@ -205,7 +212,7 @@ namespace MUNCHKIN
             return card.GetType().Name;
         }
 
-        static void PlayCard(Player player, Player nextplayer)
+        private void PlayCard(Player player, Player nextplayer)
         {
             ShowHand(player);
 
@@ -229,7 +236,7 @@ namespace MUNCHKIN
                     else if (card is CurseCard curse)
                     {
                         Console.WriteLine("Who do you want to play the curse on?");
-                        Player targetPlayer = null;
+                        Player targetPlayer;
 
                         for (int i = 0; i < numberOfPlayers; i++)
                         {
@@ -240,20 +247,7 @@ namespace MUNCHKIN
                         if (selectedIndex >= 0 && selectedIndex < players.Count)
                         {
                             targetPlayer = players[selectedIndex];
-                        }
-
-                        if (curse.CurseEffect == "LoseLevel")
-                        {
-                            targetPlayer.level = Math.Max(1, player.level - 1);
-                        }
-                        else if (curse.CurseEffect == "DiscardEquipment")
-                        {
-                            EquipmentSlot DiscardInput;
-                            Console.WriteLine("Which equipment slot to discard? (Head, Body, Feet, Hands1, Hands2, Accessory)");
-                            if (Enum.TryParse(Console.ReadLine(), true, out DiscardInput))
-                            {
-                                targetPlayer.EquippedItems[DiscardInput] = null;
-                            }
+                            curse.ApplyCurseEffect(targetPlayer);
                         }
                     }
 
@@ -262,7 +256,7 @@ namespace MUNCHKIN
             }
         }
 
-        static void DiscardCard(Player player)
+        private void DiscardCard(Player player)
         {
             ShowHand(player);
 
@@ -280,7 +274,7 @@ namespace MUNCHKIN
             }
         }
 
-        static void KickOpenDoor(Player player)
+        private void KickOpenDoor(Player player)
         {
             if (doorDeck.cards.Count == 0)
             {
@@ -308,10 +302,12 @@ namespace MUNCHKIN
             }
         }
 
-        static void CheckOnPlayers()
+        private void CheckOnPlayers()
         {
             foreach (var player in players)
                 Console.WriteLine($"{player.Name} - Level {player.level}");
         }
+
+        
     }
 }

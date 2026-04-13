@@ -13,19 +13,6 @@ namespace MUNCHKIN
         public int NumberOfTreasures;
         public int NumberOfLevelsToGain;
 
-        static Random random = new Random();
-        static List<string> monsterNames = new List<string>
-        {
-            "Goblin", "Orc", "Troll", "Dragon", "Vampire", "Zombie", "Giant Spider", "Skeleton", "Werewolf", "Demon"
-        };
-        public MonsterCard()
-        {
-            MonsterName = monsterNames[random.Next(monsterNames.Count)];
-            MonsterLevel = random.Next(1, 21); 
-            NumberOfTreasures = random.Next(1, 5); 
-            NumberOfLevelsToGain = random.Next(1, 4); 
-        }
-
         public void MonsterBadStuff(Player player)
         {
             if (player.level > 1)
