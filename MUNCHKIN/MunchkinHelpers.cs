@@ -107,6 +107,7 @@ namespace MUNCHKIN
             Console.WriteLine("N = Next player");
             Console.WriteLine("P = Previous player");
             Console.WriteLine("E = End turn phase");
+            Console.WriteLine("C = Check players");
             Console.WriteLine("Q = Quit game");
         }
 
@@ -167,6 +168,12 @@ namespace MUNCHKIN
 
                     case ConsoleKey.E:
                         return;
+
+                    case ConsoleKey.C:
+                        Console.Clear();
+                        DisplayPlayerInfo(players);
+                        Console.ReadKey();
+                        break;
 
                     case ConsoleKey.Q:
                         Environment.Exit(0);
@@ -263,6 +270,19 @@ namespace MUNCHKIN
                         c.ApplyCurseEffect(targetPlayer);
                     }
                     break;
+
+                case OneShotCard o:
+                    Console.WriteLine("One-shot card played");
+                    // Implement one-shot effect logic here
+                    break;
+
+                case RaceCard r:
+                    player.Race = r.RaceName;
+                    break;
+
+                case ClassCard cl:
+                    player.PlayerClass = cl.ClassName;
+                    break;
             }
         }
 
@@ -333,7 +353,7 @@ namespace MUNCHKIN
         internal static void DisplayPlayerInfo(List<Player> players)
         {
             foreach (var player in players)
-                Console.WriteLine($"{player.Name} - Level {player.Level}");
+                Console.WriteLine($"{player.Name} - Level {player.Level} - Race: {player.Race} - Class: {player.PlayerClass}");
         }
     }
 }
