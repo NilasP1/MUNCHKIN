@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MUNCHKIN.Cards;
+using MUNCHKIN.Cards.TreasureCards;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,17 +11,10 @@ namespace MUNCHKIN
     internal class Player
     {
         public string Name;
-        public int level = 1;
-        public string race = "Human";
-        public string playerClass;
-        public int goldCoins = 0;
-
-        //public EquipmentCard equippedHead;
-        //public EquipmentCard equippedBody;
-        //public EquipmentCard equippedFeet;
-        //public EquipmentCard equippedHand1;
-        //public EquipmentCard equippedHand2;
-        //public EquipmentCard Accessory;
+        public int Level = 1;
+        public string Race = "Human";
+        public string PlayerClass;
+        public int GoldCoins = 0;
 
         public Dictionary<EquipmentSlot, EquipmentCard?> EquippedItems = new()
         {

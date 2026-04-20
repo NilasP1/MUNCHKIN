@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Cards.DoorCards
 {
     internal class MonsterCard : DoorCard
     {
@@ -15,9 +15,9 @@ namespace MUNCHKIN
 
         public void MonsterBadStuff(Player player)
         {
-            if (player.level > 1)
+            if (player.Level > 1)
             {
-                player.level -= 1;
+                player.Level -= 1;
             }
         }
     }

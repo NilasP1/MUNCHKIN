@@ -1,10 +1,11 @@
-﻿using System;
+﻿using MUNCHKIN.Cards.TreasureCards;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Factories
 {
     internal class OneShotCardFactory
     {

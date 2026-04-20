@@ -1,15 +1,15 @@
-﻿using MUNCHKIN;
+﻿using MUNCHKIN.Cards.DoorCards;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Factories
 {
     internal class MonsterCardFactory
     {
-        static List<string> monsterNames = new List<string>
+        private static List<string> monsterNames = new List<string>
         {
             "Goblin", "Orc", "Troll", "Dragon", "Vampire", "Zombie", "Giant Spider", "Skeleton", "Werewolf", "Demon"
         };

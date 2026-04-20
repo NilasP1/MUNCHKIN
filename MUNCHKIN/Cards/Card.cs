@@ -1,20 +1,24 @@
-﻿using System;
+﻿using MUNCHKIN.Cards.DoorCards;
+using MUNCHKIN.Cards.TreasureCards;
+using MUNCHKIN.Factories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Cards
 {
-    internal class Card
+    public class Card
     {
-
+        public string Name { get; }
+        public string Description { get; }
     }
 
     internal class DoorDeck
     {
-        public List<DoorCard> cards = new List<DoorCard>();
+        public List<DoorCard> Cards { get; } = new List<DoorCard>();
         private Random rand;
         private MonsterCardFactory monsterFactory;
         private CurseCardFactory curseFactory;
@@ -44,24 +48,24 @@ namespace MUNCHKIN
                     _ => classFactory.CreateRandom()
                 };
 
-                cards.Add(card);
+                Cards.Add(card);
             }
         }
 
         public DoorCard Draw()
         {
-            if (cards.Count == 0)
+            if (Cards.Count == 0)
                 return null;
 
-            DoorCard card = cards[0];
-            cards.RemoveAt(0);
+            DoorCard card = Cards[0];
+            Cards.RemoveAt(0);
             return card;
         }
     }
 
     class TreasureDeck
     {
-        public List<TreasureCard> cards = new List<TreasureCard>();
+        public List<TreasureCard> Cards = new List<TreasureCard>();
         private Random rand;
         private EquipmentCardFactory equipmentFactory;
         private OneShotCardFactory oneShotFactory;
@@ -85,18 +89,18 @@ namespace MUNCHKIN
                     _ => equipmentFactory.CreateRandom()
                 };
 
-                cards.Add(card);
+                Cards.Add(card);
             }
         }
 
 
         public TreasureCard Draw()
         {
-            if (cards.Count == 0)
+            if (Cards.Count == 0)
                 return null;
 
-            TreasureCard card = cards[0];
-            cards.RemoveAt(0);
+            TreasureCard card = Cards[0];
+            Cards.RemoveAt(0);
             return card;
         }
     }

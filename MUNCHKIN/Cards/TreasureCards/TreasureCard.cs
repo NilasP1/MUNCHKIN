@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Cards.TreasureCards
 {
     internal class TreasureCard : Card
     {

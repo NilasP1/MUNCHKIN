@@ -1,4 +1,4 @@
-﻿using MUNCHKIN;
+﻿using MUNCHKIN.Cards.DoorCards;
 
 internal class RaceCard : DoorCard
 {

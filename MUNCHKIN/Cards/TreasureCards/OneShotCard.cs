@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Cards.TreasureCards
 {
     internal class OneShotCard : TreasureCard
     {

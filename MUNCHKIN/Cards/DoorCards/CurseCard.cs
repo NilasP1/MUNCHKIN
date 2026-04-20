@@ -4,20 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MUNCHKIN
+namespace MUNCHKIN.Cards.DoorCards
 {
     internal class CurseCard : DoorCard
     {
         public string CurseName;
         public string CurseEffect;
-
-        
+  
 
         internal void ApplyCurseEffect(Player targetPlayer)
         {
             if (CurseEffect == "LoseLevel")
             {
-                targetPlayer.level = Math.Max(1, targetPlayer.level - 1);
+                targetPlayer.Level = Math.Max(1, targetPlayer.Level - 1);
             }
             else if (CurseEffect == "DiscardEquipment")
             {
