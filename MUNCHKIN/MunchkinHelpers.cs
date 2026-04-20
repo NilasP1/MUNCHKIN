@@ -273,7 +273,7 @@ namespace MUNCHKIN
 
                 case OneShotCard o:
                     Console.WriteLine("One-shot card played");
-                    // Implement one-shot effect logic here
+                    // TODO: Implement one-shot effect logic here
                     break;
 
                 case RaceCard r:
@@ -282,6 +282,11 @@ namespace MUNCHKIN
 
                 case ClassCard cl:
                     player.PlayerClass = cl.ClassName;
+                    break;
+
+                case MonsterCard m:
+                    Console.WriteLine($"Played a {m.MonsterName}");
+                    //TODO: add logic for playing monster cards like for adding to someone else's fight or if you do not get a monster when opening a door you can play yourself.
                     break;
             }
         }
