@@ -46,7 +46,12 @@ namespace MUNCHKIN
             Console.WriteLine("Game setup complete!");
             Console.ReadKey();
 
-            MunchkinHelpers.StartMainMenuPhase(players, doorDeck, treasureDeck);
+            bool startTurns = MunchkinHelpers.StartMainMenuPhase(players, doorDeck, treasureDeck);
+
+            if (startTurns)
+            {
+                MunchkinHelpers.StartTurnPhase(players, doorDeck, treasureDeck);
+            }
         }
     }
 }

@@ -56,33 +56,43 @@ namespace MUNCHKIN
             Console.WriteLine("Q = Quit");
         }
 
-        internal static void StartMainMenuPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
+        internal static bool StartMainMenuPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
             while (true)
             {
                 DisplayMainMenu();
-                SelectMainMenuAction(players, doorDeck, treasureDeck);
+                var result = SelectMainMenuAction(players);
+
+                if (result == true) // Start turns
+                    return true;
+
+                if (result == false) // Quit
+                    return false;
             }
         }
 
-        internal static void SelectMainMenuAction(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
+        internal static bool? SelectMainMenuAction(List<Player> players)
         {
             var key = Console.ReadKey().Key;
+
             switch (key)
             {
                 case ConsoleKey.C:
                     Console.Clear();
                     DisplayPlayerInfo(players);
                     Console.ReadKey();
-                    break;
+                    return null;
+
                 case ConsoleKey.T:
-                    StartTurnPhase(players, doorDeck, treasureDeck);
-                    break;
+                    return true; // signal: start turns
+
                 case ConsoleKey.Q:
                     Console.Clear();
                     Console.WriteLine("Goodbye!");
-                    return;
+                    return false; // signal: quit
             }
+
+            return null;
         }
 
         internal static void ShowTurnActions(Player currentPlayer)
