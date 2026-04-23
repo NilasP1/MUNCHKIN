@@ -56,43 +56,43 @@ namespace MUNCHKIN
             Console.WriteLine("Q = Quit");
         }
 
+        internal static MainMenuAction GetMainMenuAction()
+        {
+            var key = Console.ReadKey().Key;
+            return key switch
+            {
+                ConsoleKey.C => MainMenuAction.CheckPlayers,
+                ConsoleKey.T => MainMenuAction.StartTurns,
+                ConsoleKey.Q => MainMenuAction.Quit,
+                _ => MainMenuAction.None
+            };
+        }
+
         internal static bool StartMainMenuPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
             while (true)
             {
                 DisplayMainMenu();
-                var result = SelectMainMenuAction(players);
+                var action = GetMainMenuAction();
 
-                if (result == true) // Start turns
-                    return true;
-
-                if (result == false) // Quit
-                    return false;
+                switch (action)
+                {
+                    case MainMenuAction.CheckPlayers:
+                        Console.Clear();
+                        DisplayPlayerInfo(players);
+                        Console.ReadKey();
+                        break;
+                    case MainMenuAction.StartTurns:
+                        StartTurnPhase(players, doorDeck, treasureDeck);
+                        break;
+                    case MainMenuAction.Quit:
+                        return false;
+                    case MainMenuAction.None:
+                        Console.WriteLine("Invalid selection. Please try again.");
+                        Console.ReadKey();
+                        break;
+                }
             }
-        }
-
-        internal static bool? SelectMainMenuAction(List<Player> players)
-        {
-            var key = Console.ReadKey().Key;
-
-            switch (key)
-            {
-                case ConsoleKey.C:
-                    Console.Clear();
-                    DisplayPlayerInfo(players);
-                    Console.ReadKey();
-                    return null;
-
-                case ConsoleKey.T:
-                    return true; // signal: start turns
-
-                case ConsoleKey.Q:
-                    Console.Clear();
-                    Console.WriteLine("Goodbye!");
-                    return false; // signal: quit
-            }
-
-            return null;
         }
 
         internal static void ShowTurnActions(Player currentPlayer)
@@ -360,5 +360,36 @@ namespace MUNCHKIN
             foreach (var player in players)
                 Console.WriteLine($"{player.Name} - Level {player.Level} - Race: {player.Race} - Class: {player.PlayerClass}");
         }
+
+        internal static int PromptForValidPlayerAmount()
+        {
+            while (true)
+            {
+                Console.Write("How many players? ");
+                string input = Console.ReadLine() ?? "";
+                int numberOfPlayers = ValidatePlayerAmount(input);
+                if (numberOfPlayers > 0)
+                    return numberOfPlayers;
+            }
+        }
+
+        internal static int ValidatePlayerAmount(string input)
+        {
+            if (!int.TryParse(input, out int numberOfPlayers) || numberOfPlayers <= 0)
+            {
+                Console.WriteLine("Invalid number of players.");
+                return -1;
+            }
+
+            return numberOfPlayers;
+        }
+    }
+
+    internal enum MainMenuAction
+    {
+        CheckPlayers,
+        StartTurns,
+        Quit,
+        None
     }
 }

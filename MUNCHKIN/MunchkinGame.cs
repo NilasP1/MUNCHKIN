@@ -27,13 +27,8 @@ namespace MUNCHKIN
         {
             Console.Clear();
             Console.WriteLine("Welcome to Munchkin!");
-            Console.Write("How many players? ");
 
-            if (!int.TryParse(Console.ReadLine(), out numberOfPlayers) || numberOfPlayers <= 0)
-            {
-                Console.WriteLine("Invalid number of players.");
-                return;
-            }
+            numberOfPlayers = MunchkinHelpers.PromptForValidPlayerAmount();
 
             MunchkinHelpers.InitializePlayers(numberOfPlayers, players);
 
