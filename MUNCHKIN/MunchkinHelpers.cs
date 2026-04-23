@@ -11,7 +11,11 @@ namespace MUNCHKIN
 {
     internal static class MunchkinHelpers
     {
-
+        /// <summary>
+        /// the method for initializing the players, it will ask for the name of each player and add them to the list of players.
+        /// </summary>
+        /// <param name="number"></param>
+        /// <param name="players"></param>
         internal static void InitializePlayers(int number, List<Player> players)
         {
             for (int i = 0; i < number; i++)
@@ -29,6 +33,13 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will give each player the starting cards, it will draw 4 cards from the door deck and 4 cards from the treasure deck and add them to the player's hand.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="players"></param>
+        /// <param name="doorDeck"></param>
+        /// <param name="treasureDeck"></param>
         internal static void GiveStartingCards(int count, List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
             foreach (Player player in players)
@@ -47,6 +58,9 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// Displays the main menu options
+        /// </summary>
         internal static void DisplayMainMenu()
         {
             Console.Clear();
@@ -56,6 +70,10 @@ namespace MUNCHKIN
             Console.WriteLine("Q = Quit");
         }
 
+        /// <summary>
+        /// this method will read the user's input and return the corresponding action based on the key pressed
+        /// </summary>
+        /// <returns></returns>
         internal static MainMenuAction GetMainMenuAction()
         {
             var key = Console.ReadKey().Key;
@@ -68,6 +86,13 @@ namespace MUNCHKIN
             };
         }
 
+        /// <summary>
+        /// this method will start the main menu phase, it will display the main menu and wait for the user's input.
+        /// </summary>
+        /// <param name="players"></param>
+        /// <param name="doorDeck"></param>
+        /// <param name="treasureDeck"></param>
+        /// <returns></returns>
         internal static bool StartMainMenuPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
             while (true)
@@ -83,18 +108,22 @@ namespace MUNCHKIN
                         Console.ReadKey();
                         break;
                     case MainMenuAction.StartTurns:
-                        StartTurnPhase(players, doorDeck, treasureDeck);
-                        break;
+                        return true;
                     case MainMenuAction.Quit:
                         return false;
                     case MainMenuAction.None:
                         Console.WriteLine("Invalid selection. Please try again.");
                         Console.ReadKey();
+                        Console.Clear();
                         break;
                 }
             }
         }
 
+        /// <summary>
+        /// this method will display the turn actions for the current player, it will show the player's name, level and the available actions they can take during their turn.
+        /// </summary>
+        /// <param name="currentPlayer"></param>
         internal static void ShowTurnActions(Player currentPlayer)
         {
             Console.WriteLine($"--- {currentPlayer.Name}'s Turn ---");
@@ -111,6 +140,12 @@ namespace MUNCHKIN
             Console.WriteLine("Q = Quit game");
         }
 
+        /// <summary>
+        /// this method will start the turn phase, it will loop through the players and allow them to take their turn
+        /// </summary>
+        /// <param name="players"></param>
+        /// <param name="doorDeck"></param>
+        /// <param name="treasureDeck"></param>
         internal static void StartTurnPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
             int currentPlayerIndex = 0;
@@ -182,6 +217,10 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will display the player's hand, it will show the name of each card and its details
+        /// </summary>
+        /// <param name="player"></param>
         internal static void ShowHand(Player player)
         {
             Console.WriteLine($"{player.Name}'s Hand:\n");
@@ -233,6 +272,12 @@ namespace MUNCHKIN
             return card.GetType().Name; // Fallback for unknown card types
         }
 
+        /// <summary>
+        /// this method will allow the player to play a card from their hand, it will ask the player to select a card and then it will apply the effect of the card based on its type. 
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="players"></param>
+        /// <param name="numberOfPlayers"></param>
         internal static void PlayCard(Player player, List<Player> players, int numberOfPlayers)
         {
             ShowHand(player);
@@ -291,6 +336,11 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will allow the player to select a card from their hand, it will ask the player to enter the number of the card they want to play and then it will return the selected card. If the player enters an invalid number, it will return null.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
         internal static Card? SelectCard(Player player)
         {
             ShowHand(player);
@@ -309,6 +359,10 @@ namespace MUNCHKIN
             return null;
         }
 
+        /// <summary>
+        /// this method will allow the player to discard a card from their hand, it will ask the player to enter the number of the card they want to discard and then it will remove the selected card from the player's hand. If the player enters an invalid number, it will do nothing.
+        /// </summary>
+        /// <param name="player"></param>
         internal static void DiscardCard(Player player)
         {
             ShowHand(player);
@@ -327,6 +381,11 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will allow the player to kick open a door, it will draw a card from the door deck and then it will apply the effect of the card based on its type
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="doorDeck"></param>
         internal static void KickOpenDoor(Player player, DoorDeck doorDeck)
         {
             if (doorDeck.Cards.Count == 0)
@@ -355,12 +414,20 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will display the information of all players, it will show the name, level
+        /// </summary>
+        /// <param name="players"></param>
         internal static void DisplayPlayerInfo(List<Player> players)
         {
             foreach (var player in players)
                 Console.WriteLine($"{player.Name} - Level {player.Level} - Race: {player.Race} - Class: {player.PlayerClass}");
         }
 
+        /// <summary>
+        /// this method will prompt the user to enter the number of players and then validate if it is a valid number
+        /// </summary>
+        /// <returns></returns>
         internal static int PromptForValidPlayerAmount()
         {
             while (true)
@@ -373,11 +440,18 @@ namespace MUNCHKIN
             }
         }
 
+        /// <summary>
+        /// this method will validate the player's input for the number of players
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         internal static int ValidatePlayerAmount(string input)
         {
             if (!int.TryParse(input, out int numberOfPlayers) || numberOfPlayers <= 0)
             {
                 Console.WriteLine("Invalid number of players.");
+                Console.ReadKey();
+                Console.Clear();
                 return -1;
             }
 
