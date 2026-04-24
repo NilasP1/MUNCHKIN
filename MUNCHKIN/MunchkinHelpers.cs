@@ -93,7 +93,7 @@ namespace MUNCHKIN
         /// <param name="doorDeck"></param>
         /// <param name="treasureDeck"></param>
         /// <returns></returns>
-        internal static bool StartMainMenuPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
+        internal static MainMenuAction RunMainMenu(List<Player> players)
         {
             while (true)
             {
@@ -103,14 +103,14 @@ namespace MUNCHKIN
                 switch (action)
                 {
                     case MainMenuAction.CheckPlayers:
-                        Console.Clear();
-                        DisplayPlayerInfo(players);
-                        Console.ReadKey();
-                        break;
+                        return MainMenuAction.CheckPlayers;
+
                     case MainMenuAction.StartTurns:
-                        return true;
+                        return MainMenuAction.StartTurns;
+
                     case MainMenuAction.Quit:
-                        return false;
+                        return MainMenuAction.Quit;
+
                     case MainMenuAction.None:
                         Console.WriteLine("Invalid selection. Please try again.");
                         Console.ReadKey();

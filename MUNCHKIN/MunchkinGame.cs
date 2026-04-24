@@ -41,11 +41,24 @@ namespace MUNCHKIN
             Console.WriteLine("Game setup complete!");
             Console.ReadKey();
 
-            bool startTurns = MunchkinHelpers.StartMainMenuPhase(players, doorDeck, treasureDeck);
-
-            if (startTurns)
+            while (true)
             {
-                MunchkinHelpers.StartTurnPhase(players, doorDeck, treasureDeck);
+                var action = MunchkinHelpers.RunMainMenu(players);
+
+                switch (action)
+                {
+                    case MainMenuAction.StartTurns:
+                        MunchkinHelpers.StartTurnPhase(players, doorDeck, treasureDeck);
+                        break;
+                    case MainMenuAction.Quit:
+                        Environment.Exit(0);
+                        break;
+                    case MainMenuAction.CheckPlayers:
+                        Console.Clear();
+                        MunchkinHelpers.DisplayPlayerInfo(players);
+                        Console.ReadKey();
+                        break;
+                }
             }
         }
     }
