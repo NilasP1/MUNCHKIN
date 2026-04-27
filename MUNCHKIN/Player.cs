@@ -15,6 +15,7 @@ namespace MUNCHKIN
         public string Race = "Human";
         public string PlayerClass;
         public int GoldCoins = 0;
+        public int EquipmentBattleBonus = 0;
 
         public Dictionary<EquipmentSlot, EquipmentCard?> EquippedItems = new()
         {

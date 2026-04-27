@@ -9,10 +9,11 @@ namespace MUNCHKIN.Factories
 {
     internal class OneShotCardFactory
     {
-        static List<string> oneShotNames = new List<string>
+        static List<OneShotEffectData> presets = new()
         {
-            "Potion of Strength", "Scroll of Fireball", "Elixir of Speed", "Bomb of Confusion", "Trap of Binding",
-            "Smoke Bomb", "Healing Salve", "Invisibility Potion", "Magic Missile Scroll", "Thunderstone"
+            new OneShotEffectData { Name = "Potion of Cowardice", TargetType = OneShotTargetType.Player, ModiferRange = (1, 3) },
+            new OneShotEffectData { Name = "Potion of Halitosis", TargetType = OneShotTargetType.Enemy, ModiferRange = (-3, -1) },
+            new OneShotEffectData { Name = "Magic Lamp", TargetType = OneShotTargetType.InstantWin, ModiferRange = (0,0) }
         };
 
         private Random rand;
@@ -25,29 +26,22 @@ namespace MUNCHKIN.Factories
         {
             OneShotCard oneshotcard = new OneShotCard();
 
-            oneshotcard.OneShotName = oneShotNames[rand.Next(oneShotNames.Count)];
-            oneshotcard.OneShotEffect = GenerateEffect(oneshotcard.OneShotName);
-            oneshotcard.GoldValue = rand.Next(50, 501);
+            OneShotEffectData preset = presets[rand.Next(presets.Count)];
+            oneshotcard.OneShotName = preset.Name;
+            oneshotcard.TargetType = preset.TargetType;
+            oneshotcard.Modifier = rand.Next(preset.ModiferRange.Item1, preset.ModiferRange.Item2);
+            oneshotcard.GoldValue = rand.Next(50, 100);
+
+            oneshotcard.Description = $"Use this card to apply a modifier of {oneshotcard.Modifier} to a {oneshotcard.TargetType.ToString().ToLower()} for the current combat.";
 
             return oneshotcard;
         }
+    }
 
-        private string GenerateEffect(string name)
-        {
-            return name switch
-            {
-                "Potion of Strength" => "Increase your strength by 5 for one battle.",
-                "Scroll of Fireball" => "Deal 10 damage to all monsters in the room.",
-                "Elixir of Speed" => "Take an extra turn immediately.",
-                "Bomb of Confusion" => "Confuse a monster, causing it to skip its next attack.",
-                "Trap of Binding" => "Immobilize a monster for one turn.",
-                "Smoke Bomb" => "Escape from any battle without penalty.",
-                "Healing Salve" => "Restore 10 health points.",
-                "Invisibility Potion" => "Avoid all monster attacks for one turn.",
-                "Magic Missile Scroll" => "Deal 15 damage to a single monster.",
-                "Thunderstone" => "Stun a monster, preventing it from attacking this turn.",
-                _ => "No effect."
-            };
-        }
+    public class OneShotEffectData
+    {
+        public string Name { get; set; }
+        public OneShotTargetType TargetType { get; set; }
+        public (int, int) ModiferRange { get; set; }
     }
 }

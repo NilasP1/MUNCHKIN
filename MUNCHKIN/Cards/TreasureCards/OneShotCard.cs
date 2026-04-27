@@ -9,6 +9,15 @@ namespace MUNCHKIN.Cards.TreasureCards
     internal class OneShotCard : TreasureCard
     {
         public string OneShotName;
-        public string OneShotEffect;  
+        public int Modifier;
+        public OneShotTargetType TargetType;
+    }
+
+    public enum OneShotTargetType
+    {
+        Player,
+        Enemy,
+        InstantWin
     }
 }
+

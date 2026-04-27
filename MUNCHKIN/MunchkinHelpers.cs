@@ -153,6 +153,7 @@ namespace MUNCHKIN
             while (true)
             {
                 Console.Clear();
+
                 var currentPlayer = players[currentPlayerIndex];
 
                 ShowTurnActions(currentPlayer);
@@ -168,7 +169,7 @@ namespace MUNCHKIN
 
                     case ConsoleKey.L:
                         Console.Clear();
-                        PlayCard(currentPlayer, players, players.Count);
+                        PlayCard(currentPlayer, players, players.Count, null);
                         Console.ReadKey();
                         break;
 
@@ -213,6 +214,14 @@ namespace MUNCHKIN
                     case ConsoleKey.Q:
                         Environment.Exit(0);
                         break;
+                }
+
+                if (currentPlayer.Level >= 10)
+                {
+                    Console.Clear();
+                    Console.WriteLine($"{currentPlayer.Name} wins the game!");
+                    Console.ReadKey();
+                    return;
                 }
             }
         }
@@ -263,7 +272,7 @@ namespace MUNCHKIN
                     return $"EQUIPMENT\nName: {e.EqupipmentName}\nSlot: {e.Slot}\nBonus: +{e.BattleBonus}\nEffect: {e.specialEffect}";
 
                 case OneShotCard o:
-                    return $"ONE SHOT\nName: {o.OneShotName}\nEffect: {o.OneShotEffect}";
+                    return $"ONE SHOT\nName: {o.OneShotName}\nEffect: {o.Description}";
 
                 case TreasureCard t:
                     return $"TREASURE\nGold Value: {t.GoldValue}";
@@ -278,7 +287,7 @@ namespace MUNCHKIN
         /// <param name="player"></param>
         /// <param name="players"></param>
         /// <param name="numberOfPlayers"></param>
-        internal static void PlayCard(Player player, List<Player> players, int numberOfPlayers)
+        internal static void PlayCard(Player player, List<Player> players, int numberOfPlayers, CombatState? combat)
         {
             ShowHand(player);
             Console.Write("\nEnter card number to play: ");
@@ -296,7 +305,16 @@ namespace MUNCHKIN
             switch (selectedCard)
             {
                 case EquipmentCard e:
+                    if(player.EquippedItems.ContainsKey(e.Slot) && player.EquippedItems[e.Slot] != null)
+                    {
+                        EquipmentCard? currentlyEquipped = player.EquippedItems[e.Slot];
+                        player.EquipmentBattleBonus -= currentlyEquipped.BattleBonus;
+
+                        Console.WriteLine($"Unequipped {currentlyEquipped.EqupipmentName} from {e.Slot} slot.");
+                    }
+
                     player.EquippedItems[e.Slot] = e;
+                    player.EquipmentBattleBonus += e.BattleBonus;
                     break;
 
                 case CurseCard c:
@@ -317,8 +335,15 @@ namespace MUNCHKIN
                     break;
 
                 case OneShotCard o:
-                    Console.WriteLine("One-shot card played");
-                    // TODO: Implement one-shot effect logic here
+                    if (combat != null)
+                    {
+                        Console.WriteLine("One-shot card played");
+                        ApplyOneShotEffect(o, combat);
+                    }
+                    else
+                    {
+                        Console.WriteLine("One-shot cards can only be played during combat.");
+                    }
                     break;
 
                 case RaceCard r:
@@ -332,6 +357,21 @@ namespace MUNCHKIN
                 case MonsterCard m:
                     Console.WriteLine($"Played a {m.MonsterName}");
                     //TODO: add logic for playing monster cards like for adding to someone else's fight or if you do not get a monster when opening a door you can play yourself.
+                    break;
+            }
+        }
+        internal static void ApplyOneShotEffect(OneShotCard o, CombatState combat)
+        {
+            switch (o.TargetType)
+            {
+                case OneShotTargetType.Player:
+                    combat.PlayerBuff += o.Modifier;
+                    break;
+                case OneShotTargetType.Enemy:
+                    combat.EnemyDebuff += o.Modifier;
+                    break;
+                case OneShotTargetType.InstantWin:
+                    combat.AutoWin = true;
                     break;
             }
         }
@@ -402,15 +442,59 @@ namespace MUNCHKIN
 
             if (drawn is MonsterCard monster)
             {
+
                 Console.WriteLine("Monster fight!");
-                Console.WriteLine("You defeat it automatically (for now).");
-                player.Level++;
+
+                StartCombat(player, monster);
+
                 Console.WriteLine($"You are now Level {player.Level}");
             }
             else
             {
                 player.CardsOnHand.Add(drawn);
                 Console.WriteLine("Card added to hand.");
+            }
+        }
+
+        internal static void StartCombat(Player player, MonsterCard monster)
+        {
+            CombatState combat = new CombatState();
+
+            while (true)
+            {
+                Console.Clear();
+
+                int playerStrength = player.Level + combat.PlayerBuff + player.EquipmentBattleBonus;
+                int monsterStrength = monster.MonsterLevel + combat.EnemyDebuff;
+
+                Console.WriteLine($"Fighting {monster.MonsterName}");
+                Console.WriteLine($"Your strength: {playerStrength}");
+                Console.WriteLine($"Monster strength: {monsterStrength}");
+                Console.WriteLine();
+
+                Console.WriteLine("P = Play card");
+                Console.WriteLine("R = Give up");
+
+                var key = Console.ReadKey().Key;
+
+                if (key == ConsoleKey.P)
+                {
+                    PlayCard(player, new List<Player> { player }, 1, combat);
+                }
+                else if (key == ConsoleKey.R)
+                {
+                    Console.WriteLine("\nYou get attacked");
+                    monster.MonsterBadStuff(player);
+                    return;
+                }
+
+                if (combat.AutoWin || playerStrength > monsterStrength)
+                {
+                    Console.WriteLine("\nYou win!");
+                    player.Level++;
+                    Console.ReadKey();
+                    return;
+                }
             }
         }
 
@@ -457,6 +541,12 @@ namespace MUNCHKIN
 
             return numberOfPlayers;
         }
+    }
+    internal class CombatState
+    {
+        public int PlayerBuff { get; set; }
+        public int EnemyDebuff { get; set; }
+        public bool AutoWin { get; set; }
     }
 
     internal enum MainMenuAction
