@@ -77,7 +77,7 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static MainMenuAction GetMainMenuAction()
         {
-            var key = Console.ReadKey().Key; // Read the key pressed by the user and determine the corresponding action based on the key
+            var key = Console.ReadKey().Key; 
 
             // Use a switch expression to return the appropriate MainMenuAction based on the key pressed
             return key switch 
@@ -98,20 +98,20 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static MainMenuAction RunMainMenu(List<Player> players)
         {
-            while (true) // Loop indefinitely until a valid action is selected
+            while (true) 
             {
-                DisplayMainMenu(); // Display the main menu options to the user
-                var action = GetMainMenuAction(); // Get the action corresponding to the user's key press
+                DisplayMainMenu(); 
+                var action = GetMainMenuAction(); 
 
-                switch (action) // Use a switch statement to handle the selected action and return it if it's valid
+                switch (action) 
                 {
-                    case MainMenuAction.CheckPlayers: // If the user selects "Check players", return the CheckPlayers action
+                    case MainMenuAction.CheckPlayers: 
                         return MainMenuAction.CheckPlayers;
 
-                    case MainMenuAction.StartTurns: // If the user selects "Start turns", return the StartTurns action
+                    case MainMenuAction.StartTurns: 
                         return MainMenuAction.StartTurns;
 
-                    case MainMenuAction.Quit: // If the user selects "Quit", return the Quit action
+                    case MainMenuAction.Quit: 
                         return MainMenuAction.Quit;
 
                     case MainMenuAction.None: // If the user selects an invalid option, display an error message and prompt again
@@ -151,18 +151,18 @@ namespace MUNCHKIN
         /// <param name="treasureDeck"></param>
         internal static void StartTurnPhase(List<Player> players, DoorDeck doorDeck, TreasureDeck treasureDeck)
         {
-            int currentPlayerIndex = 0; // Initialize the index of the current player to 0 (the first player in the list)
+            int currentPlayerIndex = 0;
 
-            while (true) // Loop indefinitely to allow players to take their turns until the game ends
+            while (true) 
             {
                 Console.Clear();
 
-                var currentPlayer = players[currentPlayerIndex]; // Get the current player based on the currentPlayerIndex
+                var currentPlayer = players[currentPlayerIndex]; 
 
-                ShowTurnActions(currentPlayer); // Display the available actions for the current player during their turn
+                ShowTurnActions(currentPlayer); 
                 var key = Console.ReadKey().Key;
 
-                switch (key) // Use a switch statement to handle the player's input and execute the corresponding action based on the key pressed
+                switch (key)
                 {
                     case ConsoleKey.M: // If the player presses "M", clear the console and show the player's hand
                         Console.Clear();
@@ -188,7 +188,7 @@ namespace MUNCHKIN
                         Console.ReadKey();
                         break;
 
-                    case ConsoleKey.N: // If the player presses "N", End that playerr's turn and move to the next player
+                    case ConsoleKey.N: // If the player presses "N", End that player's turn and move to the next player
                         bool hasTooManyCards = currentPlayer.CardsOnHand.Count > 5;
 
                         // Only move to the next player if the current player doesn't have more than 5 cards in hand
@@ -257,24 +257,24 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static string GetCardDetails(Card card)
         {
-            switch (card) // Use a switch statement to determine the type of the card and return a formatted string containing details
+            switch (card) 
             {
-                case MonsterCard m: // If the card is a MonsterCard, return its name and level
+                case MonsterCard m: 
                     return $"MONSTER\nName: {m.MonsterName}\nLevel: {m.MonsterLevel}";
 
-                case CurseCard c: // If the card is a CurseCard, return its name and effect
+                case CurseCard c:
                     return $"CURSE\nName: {c.CurseName}\nEffect: {c.CurseEffect}";
 
-                case RaceCard r: // If the card is a RaceCard, return its name and ability
+                case RaceCard r: 
                     return $"RACE\nName: {r.RaceName}\nAbility: {r.RaceAbility}";
 
-                case ClassCard cl: // If the card is a ClassCard, return its name and ability
+                case ClassCard cl: 
                     return $"CLASS\nName: {cl.ClassName}\nAbility: {cl.ClassAbility}";
 
-                case EquipmentCard e: // If the card is an EquipmentCard, return its name, slot, battle bonus, and special effect
+                case EquipmentCard e: 
                     return $"EQUIPMENT\nName: {e.EqupipmentName}\nSlot: {e.Slot}\nBonus: +{e.BattleBonus}\nEffect: {e.specialEffect}";
 
-                case OneShotCard o: // If the card is a OneShotCard, return its name and effect
+                case OneShotCard o: 
                     return $"ONE SHOT\nName: {o.OneShotName}\nEffect: {o.Description}";
             }
 
@@ -289,48 +289,48 @@ namespace MUNCHKIN
         /// <param name="numberOfPlayers"></param>
         internal static void PlayCard(Player player, List<Player> players, int numberOfPlayers, CombatState? combat)
         {
-            ShowHand(player); // Display the player's hand to allow them to see their cards before selecting one to play
+            ShowHand(player); 
             Console.Write("\nEnter card number to play: ");
-            Card? selectedCard = SelectCard(player); // Call the SelectCard method to allow the player to choose a card from their hand
-            if (selectedCard == null) // Checks if the selected card is null
+            Card? selectedCard = SelectCard(player); 
+            if (selectedCard == null) 
             {
                 Console.WriteLine("Invalid card selection.");
                 return;
             }
 
             Console.WriteLine("\nPlaying:");
-            Console.WriteLine(GetCardDetails(selectedCard)); // Display the details of the selected card
-            player.CardsOnHand.Remove(selectedCard); // Remove the selected card from the player's hand since it is being played
+            Console.WriteLine(GetCardDetails(selectedCard)); 
+            player.CardsOnHand.Remove(selectedCard); 
 
-            switch (selectedCard) // Use a switch statement to determine the type of the selected card and apply its effect accordingly
+            switch (selectedCard) 
             {
                 case EquipmentCard e: // If the card is an EquipmentCard
-                    if (player.EquippedItems.ContainsKey(e.Slot) && player.EquippedItems[e.Slot] != null) // Checks if there already is an item in that slot
+                    if (player.EquippedItems.ContainsKey(e.Slot) && player.EquippedItems[e.Slot] != null)
                     {
                         EquipmentCard? currentlyEquipped = player.EquippedItems[e.Slot]; // Get the currently equipped item in that slot
-                        player.EquipmentBattleBonus -= currentlyEquipped.BattleBonus; // Remove the battle bonus of the currently equipped item from the player's total battle bonus
+                        player.EquipmentBattleBonus -= currentlyEquipped.BattleBonus; 
 
                         Console.WriteLine($"Unequipped {currentlyEquipped.EqupipmentName} from {e.Slot} slot."); 
                     }
 
-                    player.EquippedItems[e.Slot] = e; // Equip the new item in the specified slot
-                    player.EquipmentBattleBonus += e.BattleBonus; // Add the battle bonus of the newly equipped item to the player's total battle bonus
+                    player.EquippedItems[e.Slot] = e; 
+                    player.EquipmentBattleBonus += e.BattleBonus; 
                     break;
 
                 case CurseCard c: // If the card is a CurseCard
                     Console.WriteLine("Who do you want to play the curse on?");
                     Player targetPlayer;
 
-                    for (int i = 0; i < numberOfPlayers; i++) // Loop through the list of players and display their names with corresponding numbers for selection
+                    for (int i = 0; i < numberOfPlayers; i++) 
                     {
                         Console.WriteLine($"{i + 1}. {players[i].Name}");
                     }
 
                     int selectedIndex = Console.ReadKey().KeyChar - '1'; // Read the key pressed by the user, convert it to an index by subtracting 1
-                    if (selectedIndex >= 0 && selectedIndex < players.Count) // Check if the selected index is valid 
+                    if (selectedIndex >= 0 && selectedIndex < players.Count) 
                     {
-                        targetPlayer = players[selectedIndex]; // Get the target player based on the selected index
-                        c.ApplyCurseEffect(targetPlayer); // Apply the curse effect to the target player by calling the ApplyCurseEffect method of the CurseCard
+                        targetPlayer = players[selectedIndex]; 
+                        c.ApplyCurseEffect(targetPlayer); 
                     }
                     break;
 
@@ -338,7 +338,7 @@ namespace MUNCHKIN
                     if (combat != null)
                     {
                         Console.WriteLine("One-shot card played");
-                        ApplyOneShotEffect(o, combat); // Apply the one-shot effect by calling the ApplyOneShotEffect method
+                        ApplyOneShotEffect(o, combat); 
                     }
                     else
                     {
@@ -347,11 +347,11 @@ namespace MUNCHKIN
                     break;
 
                 case RaceCard r: // If the card is a RaceCard
-                    player.Race = r.RaceName; // Set the player's race
+                    player.Race = r.RaceName;
                     break;
 
                 case ClassCard cl: // If the card is a ClassCard
-                    player.PlayerClass = cl.ClassName; // Set the player's class
+                    player.PlayerClass = cl.ClassName; 
                     break;
 
                 case MonsterCard m: // If the card is a MonsterCard
@@ -362,16 +362,16 @@ namespace MUNCHKIN
         }
         internal static void ApplyOneShotEffect(OneShotCard o, CombatState combat)
         {
-            switch (o.TargetType) // Use a switch statement to determine the target type of the one-shot card and apply its effect accordingly
+            switch (o.TargetType) 
             {
-                case OneShotTargetType.Player: // If the target type is Player, add the modifier of the one-shot card to the player's buff in combat
-                    combat.PlayerBuff += o.Modifier; // Add the modifier of the one-shot card to the player's buff in combat
+                case OneShotTargetType.Player:
+                    combat.PlayerBuff += o.Modifier; 
                     break;
-                case OneShotTargetType.Enemy: // If the target type is Enemy, add the modifier of the one-shot card to the enemy's debuff in combat
-                    combat.EnemyDebuff += o.Modifier; // Add the modifier of the one-shot card to the enemy's debuff in combat
+                case OneShotTargetType.Enemy: 
+                    combat.EnemyDebuff += o.Modifier; 
                     break;
-                case OneShotTargetType.InstantWin: // If the target type is InstantWin, set the AutoWin flag to true
-                    combat.AutoWin = true; // Set the AutoWin flag to true, which will automatically win the combat for the player
+                case OneShotTargetType.InstantWin: 
+                    combat.AutoWin = true; 
                     break;
             }
         }
@@ -383,16 +383,16 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static Card? SelectCard(Player player)
         {
-            ShowHand(player); // Display the player's hand to allow them to see their cards before selecting one
-            Console.Write("\nEnter card number to play: "); // Prompt the player to enter the number of the card they want to play
+            ShowHand(player);
+            Console.Write("\nEnter card number to play: "); 
 
             if (int.TryParse(Console.ReadLine(), out int index)) // Read the player's input and try to parse it as an integer index
             {
-                index--; // Adjust the index to be zero-based (since the displayed card numbers are one-based)
+                index--; 
 
-                if (index >= 0 && index < player.CardsOnHand.Count) // Check if the entered index is valid (within the range of the player's hand)
+                if (index >= 0 && index < player.CardsOnHand.Count) 
                 {
-                    return player.CardsOnHand[index]; // If the index is valid, return the selected card from the player's hand
+                    return player.CardsOnHand[index]; 
                 }
             }
 
@@ -405,17 +405,17 @@ namespace MUNCHKIN
         /// <param name="player"></param>
         internal static void DiscardCard(Player player)
         {
-            ShowHand(player); // Display the player's hand to allow them to see their cards before selecting one to discard
+            ShowHand(player); 
 
-            Console.Write("\nEnter card number to discard: "); // Prompt the player to enter the number of the card they want to discard
+            Console.Write("\nEnter card number to discard: "); 
 
             if (int.TryParse(Console.ReadLine(), out int index)) // Read the player's input and try to parse it as an integer index
-            {
-                index--; // Adjust the index to be zero-based (since the displayed card numbers are one-based)
+            { 
+                index--; 
 
-                if (index >= 0 && index < player.CardsOnHand.Count) // Check if the entered index is valid (within the range of the player's hand)
+                if (index >= 0 && index < player.CardsOnHand.Count) 
                 {
-                    player.CardsOnHand.RemoveAt(index); // If the index is valid, remove the selected card from the player's hand using RemoveAt method
+                    player.CardsOnHand.RemoveAt(index); 
                     Console.WriteLine("Card discarded.");
                 }
             }
@@ -428,23 +428,22 @@ namespace MUNCHKIN
         /// <param name="doorDeck"></param>
         internal static void KickOpenDoor(Player player, DoorDeck doorDeck)
         {
-            if (doorDeck.Cards.Count == 0) // Check if the door deck is empty before attempting to draw a card
+            if (doorDeck.Cards.Count == 0) 
             {
-                Console.WriteLine("Door deck is empty!");
-                return;
+                doorDeck.CreateDeck(95);
             }
 
-            Card drawn = doorDeck.Draw(); // Draw a card from the door deck
+            Card drawn = doorDeck.Draw(); 
 
             Console.WriteLine("You drew:");
-            Console.WriteLine(GetCardDetails(drawn)); // Display the details of the drawn card
+            Console.WriteLine(GetCardDetails(drawn)); 
             Console.WriteLine();
 
             if (drawn is MonsterCard monster) // Check if the drawn card is a MonsterCard, if so, start combat with that monster
             {
                 Console.WriteLine("Monster fight!");
 
-                StartCombat(player, monster); // Start combat with the drawn monster card by calling the StartCombat method
+                StartCombat(player, monster); 
 
                 Console.WriteLine($"You are now Level {player.Level}");
             }
@@ -459,12 +458,12 @@ namespace MUNCHKIN
         {
             CombatState combat = new CombatState(); // Initialize a new CombatState object to keep track of the player's buffs, enemy debuffs, and auto-win status during combat
 
-            while (true) // Loop indefinitely until the combat is resolved (either the player wins or gives up)
+            while (true) 
             {
                 Console.Clear();
 
-                int playerStrength = player.Level + combat.PlayerBuff + player.EquipmentBattleBonus; // Calculate the player's strength by adding their level, any buffs from one-shot cards, and their equipment battle bonus
-                int monsterStrength = monster.MonsterLevel + combat.EnemyDebuff; // Calculate the monster's strength by adding its level and any debuffs from one-shot cards
+                int playerStrength = player.Level + combat.PlayerBuff + player.EquipmentBattleBonus; 
+                int monsterStrength = monster.MonsterLevel + combat.EnemyDebuff; 
 
                 Console.WriteLine($"Fighting {monster.MonsterName}");
                 Console.WriteLine($"Your strength: {playerStrength}");
@@ -476,21 +475,21 @@ namespace MUNCHKIN
 
                 var key = Console.ReadKey().Key;
 
-                if (key == ConsoleKey.P) // If the player presses "P", allow them to play a card from their hand to try to win the combat
+                if (key == ConsoleKey.P) 
                 {
-                    PlayCard(player, new List<Player> { player }, 1, combat); // Call the PlayCard method with a list containing only the current player and the combat state to allow them to play a card that can affect the combat outcome
+                    PlayCard(player, new List<Player> { player }, 1, combat); 
                 }
-                else if (key == ConsoleKey.R) // If the player presses "R", they give up and the monster's bad stuff is applied to them
+                else if (key == ConsoleKey.R)
                 {
                     Console.WriteLine("\nYou get attacked");
-                    monster.MonsterBadStuff(player); // Apply the monster's bad stuff to the player by calling the MonsterBadStuff method of the MonsterCard
+                    monster.MonsterBadStuff(player);
                     return;
                 }
 
-                if (combat.AutoWin || playerStrength > monsterStrength) // Check if the player has an auto-win condition from a one-shot card or if their strength exceeds the monster's strength, which means they win the combat
+                if (combat.AutoWin || playerStrength > monsterStrength) 
                 {
                     Console.WriteLine("\nYou win!");
-                    player.Level++; // Increase the player's level by 1 as a reward for winning the combat
+                    player.Level++;
                     Console.ReadKey();
                     return;
                 }
@@ -513,11 +512,11 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static int PromptForValidPlayerAmount()
         {
-            while (true) // Loop indefinitely until a valid number of players is entered
+            while (true)
             {
                 Console.Write("How many players? ");
                 string input = Console.ReadLine() ?? "";
-                int numberOfPlayers = ValidatePlayerAmount(input); // Call the ValidatePlayerAmount method to check if the entered input is a valid number of players
+                int numberOfPlayers = ValidatePlayerAmount(input); 
                 if (numberOfPlayers > 0)
                     return numberOfPlayers;
             }
@@ -530,7 +529,7 @@ namespace MUNCHKIN
         /// <returns></returns>
         internal static int ValidatePlayerAmount(string input)
         {
-            if (!int.TryParse(input, out int numberOfPlayers) || numberOfPlayers <= 0) // Try to parse the input as an integer and check if it's greater than 0, if not, display an error message and return -1 to indicate invalid input
+            if (!int.TryParse(input, out int numberOfPlayers) || numberOfPlayers <= 0) 
             {
                 Console.WriteLine("Invalid number of players.");
                 Console.ReadKey();

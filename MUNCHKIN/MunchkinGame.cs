@@ -41,21 +41,21 @@ namespace MUNCHKIN
             Console.WriteLine("Game setup complete!");
             Console.ReadKey();
 
-            while (true) //Main Menu loop, runs until the user decides to quit the game
+            while (true) 
             {
                 var action = MunchkinHelpers.RunMainMenu(players); //Uses a method to display and return the user's choice from the main menu
 
-                switch (action) //Performs the action chosen by the user in the main menu
+                switch (action) 
                 {
                     case MainMenuAction.StartTurns:
-                        MunchkinHelpers.StartTurnPhase(players, doorDeck, treasureDeck); //Starts the turn phase, which will loop through each player's turn until a player wins by reaching level 10
+                        MunchkinHelpers.StartTurnPhase(players, doorDeck, treasureDeck); 
                         break;
                     case MainMenuAction.Quit:
-                        Environment.Exit(0); //Exits the game
+                        Environment.Exit(0); 
                         break;
                     case MainMenuAction.CheckPlayers:
                         Console.Clear();
-                        MunchkinHelpers.DisplayPlayerInfo(players); //Displays the current players and information about them
+                        MunchkinHelpers.DisplayPlayerInfo(players); 
                         Console.ReadKey();
                         break;
                 }
