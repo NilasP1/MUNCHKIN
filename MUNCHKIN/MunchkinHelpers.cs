@@ -178,7 +178,7 @@ namespace MUNCHKIN
 
                     case ConsoleKey.D: // If the player presses "D", clear the console and allow the player to draw a card from the door deck and apply its effect
                         Console.Clear();
-                        KickOpenDoor(currentPlayer, doorDeck);
+                        KickOpenDoor(currentPlayer, doorDeck, players);
                         Console.ReadKey();
                         break;
 
@@ -357,6 +357,7 @@ namespace MUNCHKIN
                 case MonsterCard m: // If the card is a MonsterCard
                     Console.WriteLine($"Played a {m.MonsterName}");
                     //TODO: add logic for playing monster cards like for adding to someone else's fight or if you do not get a monster when opening a door you can play yourself.
+
                     break;
             }
         }
@@ -426,7 +427,7 @@ namespace MUNCHKIN
         /// </summary>
         /// <param name="player"></param>
         /// <param name="doorDeck"></param>
-        internal static void KickOpenDoor(Player player, DoorDeck doorDeck)
+        internal static void KickOpenDoor(Player player, DoorDeck doorDeck, List<Player> players)
         {
             if (doorDeck.Cards.Count == 0) 
             {
@@ -443,7 +444,7 @@ namespace MUNCHKIN
             {
                 Console.WriteLine("Monster fight!");
 
-                StartCombat(player, monster); 
+                StartCombat(player, monster, players); 
 
                 Console.WriteLine($"You are now Level {player.Level}");
             }
@@ -454,16 +455,18 @@ namespace MUNCHKIN
             }
         }
 
-        internal static void StartCombat(Player player, MonsterCard monster)
+        internal static void StartCombat(Player player, MonsterCard monster, List<Player> players)
         {
             CombatState combat = new CombatState(); // Initialize a new CombatState object to keep track of the player's buffs, enemy debuffs, and auto-win status during combat
+            int extraMonsterStrength = 0;
 
             while (true) 
             {
                 Console.Clear();
 
-                int playerStrength = player.Level + combat.PlayerBuff + player.EquipmentBattleBonus; 
-                int monsterStrength = monster.MonsterLevel + combat.EnemyDebuff; 
+
+                int playerStrength = player.Level + combat.PlayerBuff + player.EquipmentBattleBonus;
+                int monsterStrength = monster.MonsterLevel + extraMonsterStrength + combat.EnemyDebuff;
 
                 Console.WriteLine($"Fighting {monster.MonsterName}");
                 Console.WriteLine($"Your strength: {playerStrength}");
@@ -471,19 +474,63 @@ namespace MUNCHKIN
                 Console.WriteLine();
 
                 Console.WriteLine("P = Play card");
+                Console.WriteLine("O = Other players add monsters to the fight");
                 Console.WriteLine("R = Give up");
 
                 var key = Console.ReadKey().Key;
 
                 if (key == ConsoleKey.P) 
                 {
-                    PlayCard(player, new List<Player> { player }, 1, combat); 
+                    PlayCard(player, players, 1, combat);
                 }
                 else if (key == ConsoleKey.R)
                 {
                     Console.WriteLine("\nYou get attacked");
                     monster.MonsterBadStuff(player);
                     return;
+                }
+                else if (key == ConsoleKey.O)
+                {
+                    Console.Clear();
+                    Console.WriteLine("What player wants to add a monster?");
+                    DisplayPlayerSelection(players);
+                    int selectedIndex = Console.ReadKey().KeyChar - '1';
+
+                    if (selectedIndex < 0 || selectedIndex >= players.Count)
+                    {
+                        Console.WriteLine("\nInvalid player.");
+                        Console.ReadKey();
+                        continue;
+                    }
+
+                    Player selectedPlayer = players[selectedIndex];
+                    Console.Clear();
+                    Console.WriteLine($"\n{selectedPlayer.Name}, select a monster card from your hand to add to the fight:");
+                    
+                    Card? selectedCard = SelectCard(selectedPlayer);
+                    if (selectedCard is MonsterCard m)
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"\n{selectedPlayer.Name} added {m.MonsterName} to the fight!");
+                        extraMonsterStrength += m.MonsterLevel;
+                        Console.WriteLine($"{monster.MonsterName} received {m.MonsterLevel} strength from {m.MonsterName}");
+                        selectedPlayer.CardsOnHand.Remove(selectedCard); 
+
+                        Console.WriteLine("");
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+
+                        Console.Clear();
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nInvalid selection. Only monster cards can be added to the fight.");
+                        Console.WriteLine("");
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+                        continue;
+                    }
                 }
 
                 if (combat.AutoWin || playerStrength > monsterStrength) 
@@ -493,6 +540,16 @@ namespace MUNCHKIN
                     Console.ReadKey();
                     return;
                 }
+            }
+        }
+
+        internal static void DisplayPlayerSelection(List<Player> players)
+        {
+            int PlayerIndex = 0;
+            foreach (var player in players)
+            {
+                Console.WriteLine($"{PlayerIndex + 1}. {player.Name} - Level {player.Level}");
+                PlayerIndex++;
             }
         }
 
