@@ -491,6 +491,7 @@ namespace MUNCHKIN
                 }
                 else if (key == ConsoleKey.O)
                 {
+                    Console.Write("\u001b[3J"); // Clears the text that has been scrolled past
                     Console.Clear();
                     Console.WriteLine("What player wants to add a monster?");
                     DisplayPlayerSelection(players);
