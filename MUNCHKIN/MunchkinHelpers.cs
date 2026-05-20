@@ -168,6 +168,8 @@ namespace MUNCHKIN
                         Console.Clear();
                         ShowHand(currentPlayer);
                         Console.ReadKey();
+                        Console.Write("\u001b[3J"); // Clears the text that has been scrolled pasts
+                        Console.Clear();
                         break;
 
                     case ConsoleKey.L: // If the player presses "L", clear the console and allow the player to play a card from their hand
@@ -397,6 +399,9 @@ namespace MUNCHKIN
                 }
             }
 
+            Console.Write("\u001b[3J"); // Clears the text that has been scrolled pasts
+            Console.Clear();
+
             return null; // If the input is invalid (not a number or out of range), return null to indicate an invalid selection
         }
 
@@ -491,7 +496,7 @@ namespace MUNCHKIN
                 }
                 else if (key == ConsoleKey.O)
                 {
-                    Console.Write("\u001b[3J"); // Clears the text that has been scrolled past
+                    Console.Write("\u001b[3J"); // Clears the text that has been scrolled pasts
                     Console.Clear();
                     Console.WriteLine("What player wants to add a monster?");
                     DisplayPlayerSelection(players);
