@@ -167,6 +167,7 @@ namespace MUNCHKIN
                     case ConsoleKey.M: // If the player presses "M", clear the console and show the player's hand
                         Console.Clear();
                         ShowHand(currentPlayer);
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
                         Console.Write("\u001b[3J"); // Clears the text that has been scrolled pasts
                         Console.Clear();
@@ -175,18 +176,20 @@ namespace MUNCHKIN
                     case ConsoleKey.L: // If the player presses "L", clear the console and allow the player to play a card from their hand
                         Console.Clear();
                         PlayCard(currentPlayer, players, players.Count, null);
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
                         break;
 
                     case ConsoleKey.D: // If the player presses "D", clear the console and allow the player to draw a card from the door deck and apply its effect
                         Console.Clear();
-                        KickOpenDoor(currentPlayer, doorDeck, players);
+                        KickOpenDoor(currentPlayer, doorDeck, players, treasureDeck);
                         Console.ReadKey();
                         break;
 
                     case ConsoleKey.R: // If the player presses "R", clear the console and allow the player to discard a card from their hand
                         Console.Clear();
                         DiscardCard(currentPlayer);
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
                         break;
 
@@ -199,6 +202,7 @@ namespace MUNCHKIN
                         if (hasTooManyCards)
                         {
                             Console.WriteLine("You have more than 5 cards in hand. Please discard down to 5 before ending your turn.");
+                            Console.WriteLine("Press any key to continue");
                             Console.ReadKey();
                         }
                         break;
@@ -213,6 +217,8 @@ namespace MUNCHKIN
                     case ConsoleKey.C: // If the player presses "C", clear the console and display the information of all players
                         Console.Clear();
                         DisplayPlayerInfo(players);
+                        Console.WriteLine("");
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
                         break;
 
@@ -225,6 +231,7 @@ namespace MUNCHKIN
                 {
                     Console.Clear();
                     Console.WriteLine($"{currentPlayer.Name} wins the game!");
+                    Console.WriteLine("Press any key to continue");
                     Console.ReadKey();
                     return;
                 }
@@ -290,8 +297,7 @@ namespace MUNCHKIN
         /// <param name="players"></param>
         /// <param name="numberOfPlayers"></param>
         internal static void PlayCard(Player player, List<Player> players, int numberOfPlayers, CombatState? combat)
-        {
-            ShowHand(player); 
+        { 
             Console.Write("\nEnter card number to play: ");
             Card? selectedCard = SelectCard(player); 
             if (selectedCard == null) 
@@ -358,10 +364,12 @@ namespace MUNCHKIN
 
                 case MonsterCard m: // If the card is a MonsterCard
                     Console.WriteLine($"Played a {m.MonsterName}");
-                    //TODO: add logic for playing monster cards like for adding to someone else's fight or if you do not get a monster when opening a door you can play yourself.
-
+                   
                     break;
             }
+
+            Console.Write("\u001b[3J"); // Clears the text that has been scrolled pasts
+            Console.Clear();
         }
         internal static void ApplyOneShotEffect(OneShotCard o, CombatState combat)
         {
@@ -432,7 +440,7 @@ namespace MUNCHKIN
         /// </summary>
         /// <param name="player"></param>
         /// <param name="doorDeck"></param>
-        internal static void KickOpenDoor(Player player, DoorDeck doorDeck, List<Player> players)
+        internal static void KickOpenDoor(Player player, DoorDeck doorDeck, List<Player> players, TreasureDeck treasureDeck)
         {
             if (doorDeck.Cards.Count == 0) 
             {
@@ -449,18 +457,56 @@ namespace MUNCHKIN
             {
                 Console.WriteLine("Monster fight!");
 
-                StartCombat(player, monster, players); 
+                StartCombat(player, monster, players, treasureDeck); 
 
                 Console.WriteLine($"You are now Level {player.Level}");
             }
             else
             {
-                player.CardsOnHand.Add(drawn); // If the drawn card is not a MonsterCard, add it to the player's hand
-                Console.WriteLine("Card added to hand.");
+                Console.WriteLine("Do you want to take the card you got or seek out trouble by playing your own monster to fight against?");
+                Console.WriteLine("1 = Take card");
+                Console.WriteLine("2 = Seek out trouble");
+                string choice = Console.ReadLine();
+
+                if(int.TryParse(choice, out int parsedChoice))
+                    Console.WriteLine("");
+                else
+                {
+                    Console.WriteLine("Invalid choice. Taking card by default.");
+                    parsedChoice = 1;
+                }
+
+                Console.Clear();
+                if (parsedChoice == 1)
+                {
+                    player.CardsOnHand.Add(drawn); // If the drawn card is not a MonsterCard, add it to the player's hand
+                    Console.WriteLine("Card added to hand.");
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
+                }
+                else if (parsedChoice == 2)
+                {
+                    Console.WriteLine("Select a monster card from your hand to fight:");
+                    Card? selectedCard = SelectCard(player); 
+                    if (selectedCard is MonsterCard m) 
+                    {
+                        Console.Clear();
+                        Console.WriteLine($"You chose to seek out trouble by playing {m.MonsterName} from your hand!");
+                        player.CardsOnHand.Remove(selectedCard);
+
+                        StartCombat(player, m, players, treasureDeck); 
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid selection. You must select a monster card from your hand to seek out trouble.");
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+                    }
+                }
             }
         }
 
-        internal static void StartCombat(Player player, MonsterCard monster, List<Player> players)
+        internal static void StartCombat(Player player, MonsterCard monster, List<Player> players, TreasureDeck treasureDeck)
         {
             CombatState combat = new CombatState(); // Initialize a new CombatState object to keep track of the player's buffs, enemy debuffs, and auto-win status during combat
             int extraMonsterStrength = 0;
@@ -480,7 +526,7 @@ namespace MUNCHKIN
 
                 Console.WriteLine("P = Play card");
                 Console.WriteLine("O = Other players add monsters to the fight");
-                Console.WriteLine("R = Give up");
+                Console.WriteLine("R = Fight");
 
                 var key = Console.ReadKey().Key;
 
@@ -490,9 +536,25 @@ namespace MUNCHKIN
                 }
                 else if (key == ConsoleKey.R)
                 {
-                    Console.WriteLine("\nYou get attacked");
-                    monster.MonsterBadStuff(player);
-                    return;
+                    if (combat.AutoWin || playerStrength > monsterStrength)
+                    {
+                        Console.WriteLine("\nYou win!");
+                        player.Level++;
+                        Card DrawnTreasureCard = treasureDeck.Draw();
+                        player.CardsOnHand.Add(DrawnTreasureCard);
+                        Console.WriteLine($"You drew {DrawnTreasureCard.Name} and you also increased your level to {player.Level}!");
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nYou lose!");
+                        monster.MonsterBadStuff(player);
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+                        return;
+                    }
                 }
                 else if (key == ConsoleKey.O)
                 {
@@ -505,6 +567,7 @@ namespace MUNCHKIN
                     if (selectedIndex < 0 || selectedIndex >= players.Count)
                     {
                         Console.WriteLine("\nInvalid player.");
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
                         continue;
                     }
@@ -539,13 +602,7 @@ namespace MUNCHKIN
                     }
                 }
 
-                if (combat.AutoWin || playerStrength > monsterStrength) 
-                {
-                    Console.WriteLine("\nYou win!");
-                    player.Level++;
-                    Console.ReadKey();
-                    return;
-                }
+                
             }
         }
 
@@ -595,6 +652,7 @@ namespace MUNCHKIN
             if (!int.TryParse(input, out int numberOfPlayers) || numberOfPlayers <= 0) 
             {
                 Console.WriteLine("Invalid number of players.");
+                Console.WriteLine("Press any key to continue");
                 Console.ReadKey();
                 Console.Clear();
                 return -1;
